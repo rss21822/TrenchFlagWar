@@ -5,154 +5,221 @@ using { /Fortnite.com/UI }
 using { /UnrealEngine.com/Temporary/UI }
 using { /Verse.org/Assets }
 using { /UnrealEngine.com/Temporary/SpatialMath }
+using { /Verse.org/Colors }
 
-Category := class():
-    Texture : []texture = array:
-        Textures.CategoriesPng
-    CatBG : texture_block = texture_block{DefaultImage := Textures.CategoriesPng}
+SpawnSelector := class():
 
     var MainCanvas : canvas = canvas{}
-    var ShotgunsButton : button_regular = button_regular{}
-    var SmgsButton : button_regular = button_regular{}
-    var RiflesButton : button_regular = button_regular{}
-    var SnipersButton : button_regular = button_regular{}
-    var MobilitiesButton : button_regular = button_regular{}
-    var HealsButton : button_regular = button_regular{}
+    var LeftBaseButton : button_regular = button_regular{}
+    var LeftBaseBackground : color_block = color_block{}
+    var TrenchAButton : button_regular = button_regular{}
+    var TrenchBButton : button_regular = button_regular{}
+    var TrenchCButton : button_regular = button_regular{}
+    var TrenchDButton : button_regular = button_regular{}
+    var TrenchEButton : button_regular = button_regular{}
+    var TrenchFButton : button_regular = button_regular{}
+    var RightBaseButton : button_regular = button_regular{}
+    var RightBaseBackground : color_block = color_block{}
     var ExitButton : button_regular = button_regular{}
-
-    <#
-    var ShotgunsTab : ShotgunsPage = ShotgunsPage{}
-    var SmgsTab : Smgs_Page = Smgs_Page{}
-    var RiflesTab : RiflesPage = RiflesPage{}
-    var SnipersTab : SnipersPage = SnipersPage{}
-    var MobilitiesTab : MobilitiesPage = MobilitiesPage{}
-    var HealsTab : HealsPage = HealsPage{}
-    #>
+    var ExitButtonBackground : color_block = color_block{}
 
     AddUI(Agent : agent) : void =
         if (Player := player[Agent], PlayerUI := GetPlayerUI[Player]):
             set MainCanvas = CreateUI()
-            PlayerUI.AddWidget(MainCanvas , player_ui_slot{InputMode := ui_input_mode.All})
+            PlayerUI.AddWidget(MainCanvas, player_ui_slot{InputMode := ui_input_mode.All})
 
     RemoveUI(Agent : agent) : void =
         if (Player := player[Agent], PlayerUI := GetPlayerUI[Player]):
             PlayerUI.RemoveWidget(MainCanvas)
 
-    HandleExit(Message : widget_message) : void=
+    HandleExit(Message : widget_message) : void =
         Player := Message.Player
         if(PlayerUI := GetPlayerUI[Player]):
             PlayerUI.RemoveWidget(MainCanvas)
 
-    StringToMessage4<localizes>(String : string) : message = "{String}"
-
-    OpenShotgunsTab(Message : widget_message) : void=
+    SelectLeftBase(Message : widget_message) : void =
         Player := Message.Player
-        RemoveUI(Player)  # Remove the Category UI
-        #ShotgunsTab.RemoteOpen(Player)  # Open the Shotguns UI
+        RemoveUI(Player)
+        # TODO: Implement spawn logic here
 
-    OpenSmgsTab(Message : widget_message) : void=
+    SelectTrenchA(Message : widget_message) : void =
         Player := Message.Player
-        RemoveUI(Player)  # Remove the Category UI
-        #SmgsTab.RemoteOpen(Player)  # Open the SMGs UI
+        RemoveUI(Player)
+        # TODO: Implement spawn logic here
 
-    OpenRiflesTab(Message : widget_message) : void=
+    SelectTrenchB(Message : widget_message) : void =
         Player := Message.Player
-        RemoveUI(Player)  # Remove the Category UI
-        #RiflesTab.RemoteOpen(Player)  # Open the Rifless UI
+        RemoveUI(Player)
+        # TODO: Implement spawn logic here
 
-    OpenSnipersTab(Message : widget_message) : void=
+    SelectTrenchC(Message : widget_message) : void =
         Player := Message.Player
-        RemoveUI(Player)  # Remove the Category UI
-        #SnipersTab.RemoteOpen(Player)  # Open the Snipers UI
+        RemoveUI(Player)
+        # TODO: Implement spawn logic here
 
-    OpenMobilitiesTab(Message : widget_message) : void=
+    SelectTrenchD(Message : widget_message) : void =
         Player := Message.Player
-        RemoveUI(Player)  # Remove the Category UI
-        #MobilitiesTab.RemoteOpen(Player)  # Open the Mobilities UI
+        RemoveUI(Player)
+        # TODO: Implement spawn logic here
 
-    OpenHealsTab(Message : widget_message) : void=
+    SelectTrenchE(Message : widget_message) : void =
         Player := Message.Player
-        RemoveUI(Player)  # Remove the Category UI
-        #HealsTab.RemoteOpen(Player)  # Open the Heals UI
+        RemoveUI(Player)
+        # TODO: Implement spawn logic here
 
-    CreateUI() : canvas=
-        ShotgunsButton.SetText(StringToMessage("Shotguns"))
-        SmgsButton.SetText(StringToMessage("Smgs"))
-        RiflesButton.SetText(StringToMessage("Rifles"))
-        SnipersButton.SetText(StringToMessage("Snipers"))
-        MobilitiesButton.SetText(StringToMessage("Mobilities"))
-        HealsButton.SetText(StringToMessage("Heals"))
+    SelectTrenchF(Message : widget_message) : void =
+        Player := Message.Player
+        RemoveUI(Player)
+        # TODO: Implement spawn logic here
+
+    SelectRightBase(Message : widget_message) : void =
+        Player := Message.Player
+        RemoveUI(Player)
+        # TODO: Implement spawn logic here
+
+    CreateUI() : canvas =
+        # Set button text
+        LeftBaseButton.SetText(StringToMessage("Base"))
+        TrenchAButton.SetText(StringToMessage("A"))
+        TrenchBButton.SetText(StringToMessage("B"))
+        TrenchCButton.SetText(StringToMessage("C"))
+        TrenchDButton.SetText(StringToMessage("D"))
+        TrenchEButton.SetText(StringToMessage("E"))
+        TrenchFButton.SetText(StringToMessage("F"))
+        RightBaseButton.SetText(StringToMessage("Base"))
         ExitButton.SetText(StringToMessage("Exit"))
 
+        # Set background colors for base buttons
+        set LeftBaseBackground = color_block{DefaultColor := NamedColors.Blue, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+        set RightBaseBackground = color_block{DefaultColor := NamedColors.Red, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+        set ExitButtonBackground = color_block{DefaultColor := NamedColors.Yellow, DefaultDesiredSize := vector2{X := 300.0, Y := 100.0}}
+
+        # Subscribe button events
+        LeftBaseButton.OnClick().Subscribe(SelectLeftBase)
+        TrenchAButton.OnClick().Subscribe(SelectTrenchA)
+        TrenchBButton.OnClick().Subscribe(SelectTrenchB)
+        TrenchCButton.OnClick().Subscribe(SelectTrenchC)
+        TrenchDButton.OnClick().Subscribe(SelectTrenchD)
+        TrenchEButton.OnClick().Subscribe(SelectTrenchE)
+        TrenchFButton.OnClick().Subscribe(SelectTrenchF)
+        RightBaseButton.OnClick().Subscribe(SelectRightBase)
         ExitButton.OnClick().Subscribe(HandleExit)
-        ShotgunsButton.OnClick().Subscribe(OpenShotgunsTab)
-        SmgsButton.OnClick().Subscribe(OpenSmgsTab)
-        RiflesButton.OnClick().Subscribe(OpenRiflesTab)
-        SnipersButton.OnClick().Subscribe(OpenSnipersTab)
-        MobilitiesButton.OnClick().Subscribe(OpenMobilitiesTab)
-        HealsButton.OnClick().Subscribe(OpenHealsTab)
+
+        # ボタンの幅と高さ（縦長・2倍サイズ）
+        ButtonWidth : float = 200.0
+        ButtonHeight : float = 240.0
+        ButtonSpacing : float = 10.0  # ボタン間の隙間（2倍）
+
+        # 8つのボタンの総幅を計算
+        TotalWidth : float = (ButtonWidth * 8.0) + (ButtonSpacing * 7.0)
+        StartX : float = TotalWidth / -2.0
 
         NewUI : canvas = canvas{
             Slots := array:
+
+                # Left Base Background（青背景）
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
-                    Offsets := margin{Left:= 0.0 , Top:= -56.618191, Right := 1920.0, Bottom := 1080.0}
-                    Alignment := vector2{X:= 0.5, Y:= 0.5}
+                    Offsets := margin{Left:= StartX, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
+                    Alignment := vector2{X:= 0.0, Y:= 0.0}
                     ZOrder := 0
                     SizeToContent := false
-                    Widget := CatBG
+                    Widget := LeftBaseBackground
 
+                # Left Base Button（一番左）
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
-                    Offsets := margin{Left:= -516.960938 , Top:= -133.946884, Right := 278.178192, Bottom := 52.012012}
+                    Offsets := margin{Left:= StartX, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
                     Alignment := vector2{X:= 0.0, Y:= 0.0}
                     ZOrder := 1
                     SizeToContent := false
-                    Widget := ShotgunsButton
+                    Widget := LeftBaseButton
 
+                # Trench A Button
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
-                    Offsets := margin{Left:= -76.960938 , Top:= -133.946884, Right := 200.100113, Bottom := 52.012012}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 1.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
                     Alignment := vector2{X:= 0.0, Y:= 0.0}
                     ZOrder := 1
                     SizeToContent := false
-                    Widget := SmgsButton
+                    Widget := TrenchAButton
 
+                # Trench B Button
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
-                    Offsets := margin{Left:= 311.039062 , Top:= -133.946884, Right := 223.900391, Bottom := 52.012012}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 2.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
                     Alignment := vector2{X:= 0.0, Y:= 0.0}
                     ZOrder := 1
                     SizeToContent := false
-                    Widget := RiflesButton
+                    Widget := TrenchBButton
 
+                # Trench C Button
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
-                    Offsets := margin{Left:= -498.797394 , Top:= 279.38385, Right := 246.843704, Bottom := 52.012012}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 3.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
                     Alignment := vector2{X:= 0.0, Y:= 0.0}
                     ZOrder := 1
                     SizeToContent := false
-                    Widget := SnipersButton
+                    Widget := TrenchCButton
 
+                # Trench D Button
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
-                    Offsets := margin{Left:= -118.834885 , Top:= 279.38385, Right := 284.803192, Bottom := 52.012012}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 4.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
                     Alignment := vector2{X:= 0.0, Y:= 0.0}
                     ZOrder := 1
                     SizeToContent := false
-                    Widget := MobilitiesButton
+                    Widget := TrenchDButton
 
+                # Trench E Button
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
-                    Offsets := margin{Left:= 315.98114 , Top:= 279.38385, Right := 219.816681, Bottom := 52.012012}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 5.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
                     Alignment := vector2{X:= 0.0, Y:= 0.0}
                     ZOrder := 1
                     SizeToContent := false
-                    Widget := HealsButton
+                    Widget := TrenchEButton
 
+                # Trench F Button
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
-                    Offsets := margin{Left:= -60.482727 , Top:= 395.459473, Right := 168.603302, Bottom := 52.012012}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 6.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
+                    Alignment := vector2{X:= 0.0, Y:= 0.0}
+                    ZOrder := 1
+                    SizeToContent := false
+                    Widget := TrenchFButton
+
+                # Right Base Background（赤背景）
+                canvas_slot:
+                    Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 7.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
+                    Alignment := vector2{X:= 0.0, Y:= 0.0}
+                    ZOrder := 0
+                    SizeToContent := false
+                    Widget := RightBaseBackground
+
+                # Right Base Button（一番右）
+                canvas_slot:
+                    Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 7.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
+                    Alignment := vector2{X:= 0.0, Y:= 0.0}
+                    ZOrder := 1
+                    SizeToContent := false
+                    Widget := RightBaseButton
+
+                # Exit Button Background（黄色背景）
+                canvas_slot:
+                    Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
+                    Offsets := margin{Left:= -150.0, Top:= 250.0, Right := 300.0, Bottom := 100.0}
+                    Alignment := vector2{X:= 0.0, Y:= 0.0}
+                    ZOrder := 0
+                    SizeToContent := false
+                    Widget := ExitButtonBackground
+
+                # Exit Button（ボタン群の下、中央）
+                canvas_slot:
+                    Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
+                    Offsets := margin{Left:= -150.0, Top:= 250.0, Right := 300.0, Bottom := 100.0}
                     Alignment := vector2{X:= 0.0, Y:= 0.0}
                     ZOrder := 1
                     SizeToContent := false
@@ -160,21 +227,14 @@ Category := class():
         }
         return NewUI
 
-CategorySelector := class(creative_device):
-    @editable ButtonDevice : button_device = button_device{}
-    <#
-    @editable ShotgunsTab : ShotgunsPage = ShotgunsPage{}
-    @editable SmgsTab : Smgs_Page = Smgs_Page{}
-    @editable RiflesTab : RiflesPage = RiflesPage{}
-    @editable SnipersTab : SnipersPage = SnipersPage{}
-    @editable MobilitiesTab : MobilitiesPage = MobilitiesPage{}
-    @editable HealsTab : HealsPage = HealsPage{}
-    #>
+SpawnSelectorManager := class(creative_device):
+    @editable PlayerSpawner : player_spawner_device = player_spawner_device{}
 
-    OnBegin<override>()<suspends>:void=    
-        ButtonDevice.InteractedWithEvent.Subscribe(RemoteOpen)
+    OnBegin<override>()<suspends>:void =    
+        PlayerSpawner.SpawnedEvent.Subscribe(OnPlayerSpawned)
+        Print("SpawnSelectorManager initialized and listening for spawn events")
 
-    RemoteOpen(Agent: agent) : void =
-        Print("")
-        var NewCategory : Category = Category{}
-        NewCategory.AddUI(Agent)
+    OnPlayerSpawned(Agent: agent) : void =
+        Print("Player spawned, showing spawn selector UI")
+        var NewSpawnSelector : SpawnSelector = SpawnSelector{}
+        NewSpawnSelector.AddUI(Agent)
