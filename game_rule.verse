@@ -263,3 +263,15 @@ game_rule := class(creative_device):
     GetPlayerTeamID<public>(Agent : agent) : int =
         GetPlayerTeam(Agent)
 
+    # プレイヤーのチームが占領中のTrenchをbool配列で取得（spawn_ui用）
+    # 戻り値: [TrenchA, TrenchB, TrenchC, TrenchD, TrenchE, TrenchF]の占領状態（true=占領中）
+    GetOccupiedTrenchesByTeam<public>(TeamID : int) : []logic =
+        array{
+            if (TrenchA_State.ControllingTeam = TeamID) then true else false,
+            if (TrenchB_State.ControllingTeam = TeamID) then true else false,
+            if (TrenchC_State.ControllingTeam = TeamID) then true else false,
+            if (TrenchD_State.ControllingTeam = TeamID) then true else false,
+            if (TrenchE_State.ControllingTeam = TeamID) then true else false,
+            if (TrenchF_State.ControllingTeam = TeamID) then true else false
+        }
+

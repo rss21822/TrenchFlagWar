@@ -23,9 +23,24 @@ SpawnSelector := class():
     var ExitButton : button_regular = button_regular{}
     var ExitButtonBackground : color_block = color_block{}
 
-    AddUI(Agent : agent) : void =
+    # 黄色背景用color_block（占領状態表示用、6つのTrench分）
+    var YellowBgA : color_block = color_block{}
+    var YellowBgB : color_block = color_block{}
+    var YellowBgC : color_block = color_block{}
+    var YellowBgD : color_block = color_block{}
+    var YellowBgE : color_block = color_block{}
+    var YellowBgF : color_block = color_block{}
+
+    AddUI(Agent : agent, GameRule : game_rule) : void =
         if (Player := player[Agent], PlayerUI := GetPlayerUI[Player]):
-            set MainCanvas = CreateUI()
+            # プレイヤーのチーム情報を取得
+            PlayerTeamID := GameRule.GetPlayerTeamID(Agent)
+
+            # プレイヤーのチームが占領中のTrenchを取得
+            OccupiedTrenches := GameRule.GetOccupiedTrenchesByTeam(PlayerTeamID)
+
+            # UIを作成（占領状態を反映）
+            set MainCanvas = CreateUI(OccupiedTrenches)
             PlayerUI.AddWidget(MainCanvas, player_ui_slot{InputMode := ui_input_mode.All})
 
     RemoveUI(Agent : agent) : void =
@@ -77,7 +92,7 @@ SpawnSelector := class():
         RemoveUI(Player)
         # TODO: Implement spawn logic here
 
-    CreateUI() : canvas =
+    CreateUI(OccupiedTrenches : []logic) : canvas =
         # Set button text
         LeftBaseButton.SetText(StringToMessage("Base"))
         TrenchAButton.SetText(StringToMessage("A"))
@@ -93,6 +108,14 @@ SpawnSelector := class():
         set LeftBaseBackground = color_block{DefaultColor := NamedColors.Blue, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
         set RightBaseBackground = color_block{DefaultColor := NamedColors.Red, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
         set ExitButtonBackground = color_block{DefaultColor := NamedColors.Yellow, DefaultDesiredSize := vector2{X := 300.0, Y := 100.0}}
+
+        # Set yellow backgrounds for occupied trenches（占領状態表示）
+        set YellowBgA = color_block{DefaultColor := NamedColors.Yellow, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+        set YellowBgB = color_block{DefaultColor := NamedColors.Yellow, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+        set YellowBgC = color_block{DefaultColor := NamedColors.Yellow, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+        set YellowBgD = color_block{DefaultColor := NamedColors.Yellow, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+        set YellowBgE = color_block{DefaultColor := NamedColors.Yellow, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+        set YellowBgF = color_block{DefaultColor := NamedColors.Yellow, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
 
         # Subscribe button events
         LeftBaseButton.OnClick().Subscribe(SelectLeftBase)
@@ -114,9 +137,42 @@ SpawnSelector := class():
         TotalWidth : float = (ButtonWidth * 8.0) + (ButtonSpacing * 7.0)
         StartX : float = TotalWidth / -2.0
 
-        NewUI : canvas = canvas{
-            Slots := array:
+        # 占領状態に応じたcanvas_slotリストを動的に構築
+        var CanvasSlots : []canvas_slot = BuildCanvasSlots(OccupiedTrenches, ButtonWidth, ButtonHeight, ButtonSpacing, StartX)
 
+        NewUI : canvas = canvas{
+            Slots := CanvasSlots
+        }
+        return NewUI
+
+    # 占領状態に応じたcanvas_slotリストを構築
+    BuildCanvasSlots(OccupiedTrenches : []logic, ButtonWidth : float, ButtonHeight : float, ButtonSpacing : float, StartX : float) : []canvas_slot =
+        # 占領状態を取得（配列アクセスのエラーハンドリング）
+        if:
+            IsOccupiedA := OccupiedTrenches[0]
+            IsOccupiedB := OccupiedTrenches[1]
+            IsOccupiedC := OccupiedTrenches[2]
+            IsOccupiedD := OccupiedTrenches[3]
+            IsOccupiedE := OccupiedTrenches[4]
+            IsOccupiedF := OccupiedTrenches[5]
+        then:
+            # 占領状態に応じて黄色背景の色を設定（占領していない場合はグレー）
+            YellowColorA := if (IsOccupiedA = true) then NamedColors.Yellow else NamedColors.Gray
+            YellowColorB := if (IsOccupiedB = true) then NamedColors.Yellow else NamedColors.Gray
+            YellowColorC := if (IsOccupiedC = true) then NamedColors.Yellow else NamedColors.Gray
+            YellowColorD := if (IsOccupiedD = true) then NamedColors.Yellow else NamedColors.Gray
+            YellowColorE := if (IsOccupiedE = true) then NamedColors.Yellow else NamedColors.Gray
+            YellowColorF := if (IsOccupiedF = true) then NamedColors.Yellow else NamedColors.Gray
+
+            # color_blockを再設定
+            set YellowBgA = color_block{DefaultColor := YellowColorA, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+            set YellowBgB = color_block{DefaultColor := YellowColorB, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+            set YellowBgC = color_block{DefaultColor := YellowColorC, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+            set YellowBgD = color_block{DefaultColor := YellowColorD, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+            set YellowBgE = color_block{DefaultColor := YellowColorE, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+            set YellowBgF = color_block{DefaultColor := YellowColorF, DefaultDesiredSize := vector2{X := 200.0, Y := 240.0}}
+
+            array:
                 # Left Base Background（青背景）
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
@@ -135,6 +191,15 @@ SpawnSelector := class():
                     SizeToContent := false
                     Widget := LeftBaseButton
 
+                # Trench A Yellow Background
+                canvas_slot:
+                    Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 1.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
+                    Alignment := vector2{X:= 0.0, Y:= 0.0}
+                    ZOrder := 0
+                    SizeToContent := false
+                    Widget := YellowBgA
+
                 # Trench A Button
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
@@ -143,6 +208,15 @@ SpawnSelector := class():
                     ZOrder := 1
                     SizeToContent := false
                     Widget := TrenchAButton
+
+                # Trench B Yellow Background
+                canvas_slot:
+                    Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 2.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
+                    Alignment := vector2{X:= 0.0, Y:= 0.0}
+                    ZOrder := 0
+                    SizeToContent := false
+                    Widget := YellowBgB
 
                 # Trench B Button
                 canvas_slot:
@@ -153,6 +227,15 @@ SpawnSelector := class():
                     SizeToContent := false
                     Widget := TrenchBButton
 
+                # Trench C Yellow Background
+                canvas_slot:
+                    Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 3.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
+                    Alignment := vector2{X:= 0.0, Y:= 0.0}
+                    ZOrder := 0
+                    SizeToContent := false
+                    Widget := YellowBgC
+
                 # Trench C Button
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
@@ -161,6 +244,15 @@ SpawnSelector := class():
                     ZOrder := 1
                     SizeToContent := false
                     Widget := TrenchCButton
+
+                # Trench D Yellow Background
+                canvas_slot:
+                    Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 4.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
+                    Alignment := vector2{X:= 0.0, Y:= 0.0}
+                    ZOrder := 0
+                    SizeToContent := false
+                    Widget := YellowBgD
 
                 # Trench D Button
                 canvas_slot:
@@ -171,6 +263,15 @@ SpawnSelector := class():
                     SizeToContent := false
                     Widget := TrenchDButton
 
+                # Trench E Yellow Background
+                canvas_slot:
+                    Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 5.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
+                    Alignment := vector2{X:= 0.0, Y:= 0.0}
+                    ZOrder := 0
+                    SizeToContent := false
+                    Widget := YellowBgE
+
                 # Trench E Button
                 canvas_slot:
                     Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
@@ -179,6 +280,15 @@ SpawnSelector := class():
                     ZOrder := 1
                     SizeToContent := false
                     Widget := TrenchEButton
+
+                # Trench F Yellow Background
+                canvas_slot:
+                    Anchors := anchors{Minimum := vector2{X:=0.5, Y:= 0.5}, Maximum := vector2{X:=0.5, Y:= 0.5}}
+                    Offsets := margin{Left:= StartX + (ButtonWidth + ButtonSpacing) * 6.0, Top:= -120.0, Right := ButtonWidth, Bottom := ButtonHeight}
+                    Alignment := vector2{X:= 0.0, Y:= 0.0}
+                    ZOrder := 0
+                    SizeToContent := false
+                    Widget := YellowBgF
 
                 # Trench F Button
                 canvas_slot:
@@ -224,17 +334,22 @@ SpawnSelector := class():
                     ZOrder := 1
                     SizeToContent := false
                     Widget := ExitButton
-        }
-        return NewUI
+        else:
+            array{}
 
 SpawnSelectorManager := class(creative_device):
-    @editable PlayerSpawner : player_spawner_device = player_spawner_device{}
+    @editable PlayerSpawner : button_device = button_device{}
+    @editable PlayerSpawner2 : button_device = button_device{}
+    @editable PlayerSpawner3 : button_device = button_device{}
+    @editable GameRule : game_rule = game_rule{}
 
-    OnBegin<override>()<suspends>:void =    
-        PlayerSpawner.SpawnedEvent.Subscribe(OnPlayerSpawned)
+    OnBegin<override>()<suspends>:void =
+        PlayerSpawner.InteractedWithEvent.Subscribe(OnPlayerSpawned)
+        PlayerSpawner2.InteractedWithEvent.Subscribe(OnPlayerSpawned)
+        PlayerSpawner3.InteractedWithEvent.Subscribe(OnPlayerSpawned)
         Print("SpawnSelectorManager initialized and listening for spawn events")
 
     OnPlayerSpawned(Agent: agent) : void =
         Print("Player spawned, showing spawn selector UI")
         var NewSpawnSelector : SpawnSelector = SpawnSelector{}
-        NewSpawnSelector.AddUI(Agent)
+        NewSpawnSelector.AddUI(Agent, GameRule)
