@@ -423,7 +423,7 @@ trench_states_ui_manager := class(creative_device):
             PlayerUI.AddWidget(UICanvas)
 
     # 陣地状態を更新して表示
-    UpdateTrenchStates<public>(Players : []player, TrenchAState : trench_state, TrenchBState : trench_state, TrenchCState : trench_state, TrenchDState : trench_state, TrenchEState : trench_state, TrenchFState : trench_state):void=
+    UpdateTrenchStates<public>(Players : []player, TrenchAState : trench_state, TrenchBState : trench_state, TrenchCState : trench_state, TrenchXState : trench_state, TrenchFState : trench_state, TrenchZState : trench_state):void=
         # 各チームが占領している陣地名を収集
         var AxisTrenches : []string = array{}
         var AlliedTrenches : []string = array{}
@@ -443,20 +443,20 @@ trench_states_ui_manager := class(creative_device):
         else if (TrenchCState.ControllingTeam = 2):
             set AlliedTrenches += array{"C"}
 
-        if (TrenchDState.ControllingTeam = 1):
-            set AxisTrenches += array{"D"}
-        else if (TrenchDState.ControllingTeam = 2):
-            set AlliedTrenches += array{"D"}
-
-        if (TrenchEState.ControllingTeam = 1):
-            set AxisTrenches += array{"E"}
-        else if (TrenchEState.ControllingTeam = 2):
-            set AlliedTrenches += array{"E"}
+        if (TrenchXState.ControllingTeam = 1):
+            set AxisTrenches += array{"X"}
+        else if (TrenchXState.ControllingTeam = 2):
+            set AlliedTrenches += array{"X"}
 
         if (TrenchFState.ControllingTeam = 1):
             set AxisTrenches += array{"F"}
         else if (TrenchFState.ControllingTeam = 2):
             set AlliedTrenches += array{"F"}
+
+        if (TrenchZState.ControllingTeam = 1):
+            set AxisTrenches += array{"Z"}
+        else if (TrenchZState.ControllingTeam = 2):
+            set AlliedTrenches += array{"Z"}
 
         # 陣地名をカンマ区切りで結合
         AxisTrenchList := JoinStrings(AxisTrenches)
