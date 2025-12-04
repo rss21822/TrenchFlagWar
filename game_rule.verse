@@ -64,7 +64,7 @@ game_rule := class(creative_device):
     var TrenchB_State : trench_state = trench_state{}
     var TrenchC_State : trench_state = trench_state{}
     var TrenchX_State : trench_state = trench_state{}
-    var TrenchF_State : trench_state = trench_state{}
+    var TrenchY_State : trench_state = trench_state{}
     var TrenchZ_State : trench_state = trench_state{}
 
     # 現在のスコア�E�E未満にならなぁE��ぁE��管琁E��E
@@ -99,7 +99,7 @@ game_rule := class(creative_device):
         CheckTrenchOccupation(TrenchB_Zone, TrenchB_Capture_Area, TrenchB_State, "TrenchB")
         CheckTrenchOccupation(TrenchC_Zone, TrenchC_Capture_Area, TrenchC_State, "TrenchC")
         CheckTrenchOccupation(TrenchX_Zone, TrenchX_Capture_Area, TrenchX_State, "TrenchX")
-        CheckTrenchOccupation(TrenchF_Zone, TrenchF_Capture_Area, TrenchF_State, "TrenchF")
+        CheckTrenchOccupation(TrenchF_Zone, TrenchF_Capture_Area, TrenchY_State, "TrenchF")
         CheckTrenchOccupation(TrenchZ_Zone, TrenchZ_Capture_Area, TrenchZ_State, "TrenchZ")
 
     # 陣地の占領状態をIsInVolumeでチェチE��
@@ -170,7 +170,7 @@ game_rule := class(creative_device):
             else if (TrenchName = "TrenchF"):
                 if (TrenchA_State.ControllingTeam = 1 and TrenchB_State.ControllingTeam = 1 and TrenchC_State.ControllingTeam = 1 and TrenchX_State.ControllingTeam = 1) then true else false
             else if (TrenchName = "TrenchZ"):
-                if (TrenchA_State.ControllingTeam = 1 and TrenchB_State.ControllingTeam = 1 and TrenchC_State.ControllingTeam = 1 and TrenchX_State.ControllingTeam = 1 and TrenchF_State.ControllingTeam = 1) then true else false
+                if (TrenchA_State.ControllingTeam = 1 and TrenchB_State.ControllingTeam = 1 and TrenchC_State.ControllingTeam = 1 and TrenchX_State.ControllingTeam = 1 and TrenchY_State.ControllingTeam = 1) then true else false
             else:
                 false
         else if (TeamID = 2):
@@ -180,13 +180,13 @@ game_rule := class(creative_device):
             else if (TrenchName = "TrenchF"):
                 if (TrenchZ_State.ControllingTeam = 2) then true else false
             else if (TrenchName = "TrenchX"):
-                if (TrenchZ_State.ControllingTeam = 2 and TrenchF_State.ControllingTeam = 2) then true else false
+                if (TrenchZ_State.ControllingTeam = 2 and TrenchY_State.ControllingTeam = 2) then true else false
             else if (TrenchName = "TrenchC"):
-                if (TrenchZ_State.ControllingTeam = 2 and TrenchF_State.ControllingTeam = 2 and TrenchX_State.ControllingTeam = 2) then true else false
+                if (TrenchZ_State.ControllingTeam = 2 and TrenchY_State.ControllingTeam = 2 and TrenchX_State.ControllingTeam = 2) then true else false
             else if (TrenchName = "TrenchB"):
-                if (TrenchZ_State.ControllingTeam = 2 and TrenchF_State.ControllingTeam = 2 and TrenchX_State.ControllingTeam = 2 and TrenchC_State.ControllingTeam = 2) then true else false
+                if (TrenchZ_State.ControllingTeam = 2 and TrenchY_State.ControllingTeam = 2 and TrenchX_State.ControllingTeam = 2 and TrenchC_State.ControllingTeam = 2) then true else false
             else if (TrenchName = "TrenchA"):
-                if (TrenchZ_State.ControllingTeam = 2 and TrenchF_State.ControllingTeam = 2 and TrenchX_State.ControllingTeam = 2 and TrenchC_State.ControllingTeam = 2 and TrenchB_State.ControllingTeam = 2) then true else false
+                if (TrenchZ_State.ControllingTeam = 2 and TrenchY_State.ControllingTeam = 2 and TrenchX_State.ControllingTeam = 2 and TrenchC_State.ControllingTeam = 2 and TrenchB_State.ControllingTeam = 2) then true else false
             else:
                 false
         else:
@@ -228,7 +228,11 @@ game_rule := class(creative_device):
                 # Team2は占領できなぁE��、すでにTeam2が占領してぁE��場合�E保持
                 set NewController = if (PreviousController = 2) then 2 else PreviousController
                 Print("{TrenchName}: Team2 cannot occupy - prerequisites not met")
-        # else: 両チ�Eムがいるか誰もいなぁE��合�E現在の占領状態を保持�E�EewController = PreviousController�E�E
+        else if (State.Team1PlayerCount > 0 and State.Team2PlayerCount > 0):
+            # 両チームがいる場合は中立に戻る
+            set NewController = 0
+            Print("{TrenchName}: Contested - neutralized")
+        # else: 誰もいない場合は現在の占領状態を保持
 
         # 占領状態が変わった場合�Eみ更新
         if (NewController <> PreviousController):
@@ -252,7 +256,7 @@ game_rule := class(creative_device):
                 TrenchB_State.ControllingTeam = 1 and
                 TrenchC_State.ControllingTeam = 1 and
                 TrenchX_State.ControllingTeam = 1 and
-                TrenchF_State.ControllingTeam = 1 and
+                TrenchY_State.ControllingTeam = 1 and
                 TrenchZ_State.ControllingTeam = 1) then true else false
 
         # Team2が全Trench（A～Z）を占領しているかチェック
@@ -261,7 +265,7 @@ game_rule := class(creative_device):
                 TrenchB_State.ControllingTeam = 2 and
                 TrenchC_State.ControllingTeam = 2 and
                 TrenchX_State.ControllingTeam = 2 and
-                TrenchF_State.ControllingTeam = 2 and
+                TrenchY_State.ControllingTeam = 2 and
                 TrenchZ_State.ControllingTeam = 2) then true else false
 
         # Team1が全占領 → Red_Barrierを無効化、それ以外は有効化
@@ -287,7 +291,7 @@ game_rule := class(creative_device):
     # UIを更新
     UpdateUI() : void =
         AllPlayers := GetPlayspace().GetPlayers()
-        TrenchStatesUI.UpdateTrenchStates(AllPlayers, TrenchA_State, TrenchB_State, TrenchC_State, TrenchX_State, TrenchF_State, TrenchZ_State)
+        TrenchStatesUI.UpdateTrenchStates(AllPlayers, TrenchA_State, TrenchB_State, TrenchC_State, TrenchX_State, TrenchY_State, TrenchZ_State)
 
     # 陣地状態を取得！Epawn_ui用�E�E
     GetTrenchState<public>(TrenchIndex : int) : trench_state =
@@ -295,12 +299,12 @@ game_rule := class(creative_device):
         else if (TrenchIndex = 1) then TrenchB_State
         else if (TrenchIndex = 2) then TrenchC_State
         else if (TrenchIndex = 3) then TrenchX_State
-        else if (TrenchIndex = 4) then TrenchF_State
+        else if (TrenchIndex = 4) then TrenchY_State
         else TrenchZ_State
 
     # 全陣地状態を配�Eで取得！Epawn_ui用�E�E
     GetAllTrenchStates() : []trench_state =
-        array{TrenchA_State, TrenchB_State, TrenchC_State, TrenchX_State, TrenchF_State, TrenchZ_State}
+        array{TrenchA_State, TrenchB_State, TrenchC_State, TrenchX_State, TrenchY_State, TrenchZ_State}
 
     # プレイヤーのチ�EムIDを取得！Epawn_ui用�E�E
     GetPlayerTeamID<public>(Agent : agent) : int =
@@ -314,7 +318,7 @@ game_rule := class(creative_device):
             if (TrenchB_State.ControllingTeam = TeamID) then true else false,
             if (TrenchC_State.ControllingTeam = TeamID) then true else false,
             if (TrenchX_State.ControllingTeam = TeamID) then true else false,
-            if (TrenchF_State.ControllingTeam = TeamID) then true else false,
+            if (TrenchY_State.ControllingTeam = TeamID) then true else false,
             if (TrenchZ_State.ControllingTeam = TeamID) then true else false
         }
 

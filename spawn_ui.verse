@@ -439,6 +439,7 @@ SpawnSelector := class():
 SpawnSelectorManager := class(creative_device):
     @editable Team1_PlayerSpawner : []player_spawner_device = array{}
     @editable Team2_PlayerSpawner : []player_spawner_device = array{}
+    @editable Display_Vutton : button_device = button_device{}
     @editable GameRule : game_rule = game_rule{}
 
     # テレポーター配列（UEFNエディタで設定可能）
@@ -461,6 +462,8 @@ SpawnSelectorManager := class(creative_device):
         # Team2のすべてのPlayerSpawnerにSubscribe
         for (Spawner : Team2_PlayerSpawner):
             Spawner.SpawnedEvent.Subscribe(OnPlayerSpawned)
+
+        Display_Vutton.InteractedWithEvent.Subscribe(OnPlayerSpawned)
 
         Print("All player spawners subscribed successfully")
 

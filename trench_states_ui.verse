@@ -1,4 +1,3 @@
-
 ##########################################################################################################
 #                                                                                                        #
 #                                           Made by Oleszyk                                              #
@@ -388,11 +387,18 @@ RankSettings := class<concrete>:
         AllRanks.Elite
         AllRanks.Champion
         AllRanks.Unreal
-AllRanks<public> := module:
+AllRanks1<public> := module:
+
+# 陣地状態を保持する構造体
+trench_status := struct:
+    ControllingTeam : int = 0  # 0=中立, 1=Axis, 2=Allied
 
 # 陣地状態表示用のUIマネージャー
 trench_states_ui_manager := class(creative_device):
     var PlayerUIMap : [player]canvas = map{}
+
+    # シャドウオフセット（VERSE.txtと同じ設定）
+    TextShadowOffset:?vector2 = option{vector2{X:=2.0, Y:=2.0}}
 
     # 全プレイヤーにUIを初期化
     InitializeUI<public>(Players : []player):void=
@@ -401,26 +407,92 @@ trench_states_ui_manager := class(creative_device):
 
     # 個別プレイヤーのUI初期化
     InitPlayerUI(Player : player):void=
-        # キャンバスの作成
-        UICanvas : canvas = canvas{}
-
-        # 陣地状態表示用のテキストブロック
-        TrenchStatusText : text_block = text_block:
-            DefaultTextColor := NamedColors.White
-            DefaultText := TrenchStatusMessage("Initializing...")
-
-        # キャンバススロットの設定（画面上部に配置）
-        StatusSlot := canvas_slot:
-            Widget := TrenchStatusText
-            Anchors := anchors{Minimum := vector2{X:= 0.5, Y:= 0.0}, Maximum := vector2{X:=0.5, Y:=0.0}}
-            Offsets := margin{Left:=0.0, Top := 50.0}
-            Alignment := vector2{X := 0.5, Y := 0.0}
-
-        UICanvas.AddWidget(StatusSlot)
+        UICanvas := CreateTrenchUI("", "")
 
         # プレイヤーUIに追加
         if (set PlayerUIMap[Player] = UICanvas, PlayerUI := GetPlayerUI[Player]):
-            PlayerUI.AddWidget(UICanvas)
+            PlayerUI.AddWidget(UICanvas, player_ui_slot{ZOrder:=10, InputMode := ui_input_mode.None})
+
+    # 陣地UIを作成
+    CreateTrenchUI(AxisTrenchList : string, AlliedTrenchList : string) : canvas =
+        # Axisラベル（赤色、シャドウ付き）- VERSE.txtのRedTeamTextと同じスタイル
+        AxisLabelText : text_block = text_block{DefaultTextColor := NamedColors.Red}
+        AxisLabelText.SetText(StringToMessage("AXIS"))
+        AxisLabelText.SetShadowOffset(TextShadowOffset)
+        AxisLabelText.SetShadowOpacity(1.0)
+
+        # Axis陣地リスト（白色、赤シャドウ）- VERSE.txtのTeamTwoScoreと同じスタイル
+        AxisTrenchText : text_block = text_block{DefaultTextColor := NamedColors.White}
+        AxisTrenchDisplayText := if (AxisTrenchList = "") then "-" else AxisTrenchList
+        AxisTrenchText.SetText(StringToMessage("[{AxisTrenchDisplayText}]"))
+        AxisTrenchText.SetShadowOffset(TextShadowOffset)
+        AxisTrenchText.SetShadowOpacity(1.0)
+        AxisTrenchText.SetShadowColor(NamedColors.Red)
+
+        # VSテキスト（白色、シャドウ付き）
+        VsText : text_block = text_block{DefaultTextColor := NamedColors.White}
+        VsText.SetText(StringToMessage("VS"))
+        VsText.SetShadowOffset(TextShadowOffset)
+        VsText.SetShadowOpacity(1.0)
+
+        # Alliedラベル（青色、シャドウ付き）- VERSE.txtのBlueTeamTextと同じスタイル
+        AlliedLabelText : text_block = text_block{DefaultTextColor := NamedColors.Blue}
+        AlliedLabelText.SetText(StringToMessage("ALLIES"))
+        AlliedLabelText.SetShadowOffset(TextShadowOffset)
+        AlliedLabelText.SetShadowOpacity(1.0)
+
+        # Allied陣地リスト（白色、青シャドウ）- VERSE.txtのTeamOneScoreと同じスタイル
+        AlliedTrenchText : text_block = text_block{DefaultTextColor := NamedColors.White}
+        AlliedTrenchDisplayText := if (AlliedTrenchList = "") then "-" else AlliedTrenchList
+        AlliedTrenchText.SetText(StringToMessage("[{AlliedTrenchDisplayText}]"))
+        AlliedTrenchText.SetShadowOffset(TextShadowOffset)
+        AlliedTrenchText.SetShadowOpacity(1.0)
+        AlliedTrenchText.SetShadowColor(NamedColors.Blue)
+
+        # VERSE.txtと同様のレイアウト構造
+        NewCanvas := canvas:
+            Slots := array:
+                canvas_slot:
+                    Anchors := anchors{Minimum := vector2{X:=0.5, Y:=0.04}, Maximum := vector2{X:=0.5, Y:=0.04}}
+                    Alignment := vector2{X:=0.5, Y:=0.0}
+                    SizeToContent := true
+                    Widget := stack_box:
+                        Orientation := orientation.Horizontal
+                        Slots := array:
+                            # Axis側（左）
+                            stack_box_slot:
+                                HorizontalAlignment := horizontal_alignment.Left
+                                Widget := stack_box:
+                                    Orientation := orientation.Vertical
+                                    Slots := array:
+                                        stack_box_slot:
+                                            HorizontalAlignment := horizontal_alignment.Center
+                                            Padding := margin{Top:=6.0, Bottom:=2.0}
+                                            Widget := AxisLabelText
+                                        stack_box_slot:
+                                            HorizontalAlignment := horizontal_alignment.Center
+                                            Padding := margin{Top:=2.0, Left:=12.0, Right:=12.0, Bottom:=2.0}
+                                            Widget := AxisTrenchText
+                            # VS（中央）
+                            stack_box_slot:
+                                HorizontalAlignment := horizontal_alignment.Center
+                                Padding := margin{Top:=2.0, Left:=24.0, Right:=24.0, Bottom:=2.0}
+                                Widget := VsText
+                            # Allied側（右）
+                            stack_box_slot:
+                                HorizontalAlignment := horizontal_alignment.Right
+                                Widget := stack_box:
+                                    Orientation := orientation.Vertical
+                                    Slots := array:
+                                        stack_box_slot:
+                                            HorizontalAlignment := horizontal_alignment.Center
+                                            Padding := margin{Top:=6.0, Bottom:=2.0}
+                                            Widget := AlliedLabelText
+                                        stack_box_slot:
+                                            HorizontalAlignment := horizontal_alignment.Center
+                                            Padding := margin{Top:=2.0, Left:=12.0, Right:=12.0, Bottom:=2.0}
+                                            Widget := AlliedTrenchText
+        return NewCanvas
 
     # 陣地状態を更新して表示
     UpdateTrenchStates<public>(Players : []player, TrenchAState : trench_state, TrenchBState : trench_state, TrenchCState : trench_state, TrenchXState : trench_state, TrenchFState : trench_state, TrenchZState : trench_state):void=
@@ -449,9 +521,9 @@ trench_states_ui_manager := class(creative_device):
             set AlliedTrenches += array{"X"}
 
         if (TrenchFState.ControllingTeam = 1):
-            set AxisTrenches += array{"F"}
+            set AxisTrenches += array{"Y"}
         else if (TrenchFState.ControllingTeam = 2):
-            set AlliedTrenches += array{"F"}
+            set AlliedTrenches += array{"Y"}
 
         if (TrenchZState.ControllingTeam = 1):
             set AxisTrenches += array{"Z"}
@@ -462,11 +534,8 @@ trench_states_ui_manager := class(creative_device):
         AxisTrenchList := JoinStrings(AxisTrenches)
         AlliedTrenchList := JoinStrings(AlliedTrenches)
 
-        # ステータステキストを更新
-        StatusText := "Axis: [{AxisTrenchList}] | Allied: [{AlliedTrenchList}]"
-
         for (Player : Players):
-            UpdatePlayerUI(Player, StatusText)
+            UpdatePlayerUI(Player, AxisTrenchList, AlliedTrenchList)
 
     # 文字列配列をカンマ区切りで結合
     JoinStrings(Strings : []string) : string =
@@ -476,33 +545,19 @@ trench_states_ui_manager := class(creative_device):
                 set Result = "{Result}, {Str}"
             else:
                 set Result = Str
-        if (Result = ""):
-            return "-"
         Result
 
     # プレイヤーUIの更新
-    UpdatePlayerUI(Player : player, StatusText : string):void=
+    UpdatePlayerUI(Player : player, AxisTrenchList : string, AlliedTrenchList : string):void=
         if (UICanvas := PlayerUIMap[Player]):
-            # 既存のキャンバスを削除して再作成
+            # 既存のキャンバスを削除
             if (PlayerUI := GetPlayerUI[Player]):
                 PlayerUI.RemoveWidget(UICanvas)
 
             # 新しいキャンバスを作成
-            NewCanvas : canvas = canvas{}
-
-            TrenchStatusText : text_block = text_block:
-                DefaultTextColor := NamedColors.White
-                DefaultText := TrenchStatusMessage(StatusText)
-
-            StatusSlot := canvas_slot:
-                Widget := TrenchStatusText
-                Anchors := anchors{Minimum := vector2{X:= 0.5, Y:= 0.0}, Maximum := vector2{X:=0.5, Y:=0.0}}
-                Offsets := margin{Left:=0.0, Top := 50.0}
-                Alignment := vector2{X := 0.5, Y := 0.0}
-
-            NewCanvas.AddWidget(StatusSlot)
+            NewCanvas := CreateTrenchUI(AxisTrenchList, AlliedTrenchList)
 
             if (set PlayerUIMap[Player] = NewCanvas, PlayerUIInstance := GetPlayerUI[Player]):
-                PlayerUIInstance.AddWidget(NewCanvas)
+                PlayerUIInstance.AddWidget(NewCanvas, player_ui_slot{ZOrder:=10, InputMode := ui_input_mode.None})
 
 TrenchStatusMessage<localizes>(StatusText : string):message = "{StatusText}"
