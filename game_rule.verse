@@ -27,7 +27,7 @@ game_rule := class(creative_device):
     TrenchX_Zone : mutator_zone_device = mutator_zone_device{}
 
     @editable
-    TrenchF_Zone : mutator_zone_device = mutator_zone_device{}
+    TrenchY_Zone : mutator_zone_device = mutator_zone_device{}
 
     @editable
     TrenchZ_Zone : mutator_zone_device = mutator_zone_device{}
@@ -45,7 +45,7 @@ game_rule := class(creative_device):
     TrenchX_Capture_Area : capture_area_device = capture_area_device{}
 
     @editable
-    TrenchF_Capture_Area : capture_area_device = capture_area_device{}
+    TrenchY_Capture_Area : capture_area_device = capture_area_device{}
 
     @editable
     TrenchZ_Capture_Area : capture_area_device = capture_area_device{}
@@ -99,7 +99,7 @@ game_rule := class(creative_device):
         CheckTrenchOccupation(TrenchB_Zone, TrenchB_Capture_Area, TrenchB_State, "TrenchB")
         CheckTrenchOccupation(TrenchC_Zone, TrenchC_Capture_Area, TrenchC_State, "TrenchC")
         CheckTrenchOccupation(TrenchX_Zone, TrenchX_Capture_Area, TrenchX_State, "TrenchX")
-        CheckTrenchOccupation(TrenchF_Zone, TrenchF_Capture_Area, TrenchY_State, "TrenchF")
+        CheckTrenchOccupation(TrenchY_Zone, TrenchY_Capture_Area, TrenchY_State, "TrenchY")
         CheckTrenchOccupation(TrenchZ_Zone, TrenchZ_Capture_Area, TrenchZ_State, "TrenchZ")
 
     # 陣地の占領状態をIsInVolumeでチェチE��
@@ -167,7 +167,7 @@ game_rule := class(creative_device):
                 if (TrenchA_State.ControllingTeam = 1 and TrenchB_State.ControllingTeam = 1) then true else false
             else if (TrenchName = "TrenchX"):
                 if (TrenchA_State.ControllingTeam = 1 and TrenchB_State.ControllingTeam = 1 and TrenchC_State.ControllingTeam = 1) then true else false
-            else if (TrenchName = "TrenchF"):
+            else if (TrenchName = "TrenchY"):
                 if (TrenchA_State.ControllingTeam = 1 and TrenchB_State.ControllingTeam = 1 and TrenchC_State.ControllingTeam = 1 and TrenchX_State.ControllingTeam = 1) then true else false
             else if (TrenchName = "TrenchZ"):
                 if (TrenchA_State.ControllingTeam = 1 and TrenchB_State.ControllingTeam = 1 and TrenchC_State.ControllingTeam = 1 and TrenchX_State.ControllingTeam = 1 and TrenchY_State.ControllingTeam = 1) then true else false
@@ -177,7 +177,7 @@ game_rule := class(creative_device):
             # Team 2: Z→F→X→C→B→A の頁E��E
             if (TrenchName = "TrenchZ"):
                 true
-            else if (TrenchName = "TrenchF"):
+            else if (TrenchName = "TrenchY"):
                 if (TrenchZ_State.ControllingTeam = 2) then true else false
             else if (TrenchName = "TrenchX"):
                 if (TrenchZ_State.ControllingTeam = 2 and TrenchY_State.ControllingTeam = 2) then true else false

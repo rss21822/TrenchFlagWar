@@ -495,7 +495,7 @@ trench_states_ui_manager := class(creative_device):
         return NewCanvas
 
     # 陣地状態を更新して表示
-    UpdateTrenchStates<public>(Players : []player, TrenchAState : trench_state, TrenchBState : trench_state, TrenchCState : trench_state, TrenchXState : trench_state, TrenchFState : trench_state, TrenchZState : trench_state):void=
+    UpdateTrenchStates<public>(Players : []player, TrenchAState : trench_state, TrenchBState : trench_state, TrenchCState : trench_state, TrenchXState : trench_state, TrenchYState : trench_state, TrenchZState : trench_state):void=
         # 各チームが占領している陣地名を収集
         var AxisTrenches : []string = array{}
         var AlliedTrenches : []string = array{}
@@ -520,9 +520,9 @@ trench_states_ui_manager := class(creative_device):
         else if (TrenchXState.ControllingTeam = 2):
             set AlliedTrenches += array{"X"}
 
-        if (TrenchFState.ControllingTeam = 1):
+        if (TrenchYState.ControllingTeam = 1):
             set AxisTrenches += array{"Y"}
-        else if (TrenchFState.ControllingTeam = 2):
+        else if (TrenchYState.ControllingTeam = 2):
             set AlliedTrenches += array{"Y"}
 
         if (TrenchZState.ControllingTeam = 1):
