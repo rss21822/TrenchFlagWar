@@ -223,7 +223,7 @@ SpawnSelector := class():
         TrenchCButton.OnClick().Subscribe(SelectTrenchC)
         TrenchXButton.OnClick().Subscribe(SelectTrenchX)
         TrenchYButton.OnClick().Subscribe(SelectTrenchY)
-        TrenchYButton.OnClick().Subscribe(SelectTrenchZ)
+        TrenchZButton.OnClick().Subscribe(SelectTrenchZ)
         RightBaseButton.OnClick().Subscribe(SelectRightBase)
         ExitButton.OnClick().Subscribe(HandleExit)
 

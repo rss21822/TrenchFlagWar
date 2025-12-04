@@ -229,9 +229,23 @@ game_rule := class(creative_device):
                 set NewController = if (PreviousController = 2) then 2 else PreviousController
                 Print("{TrenchName}: Team2 cannot occupy - prerequisites not met")
         else if (State.Team1PlayerCount > 0 and State.Team2PlayerCount > 0):
-            # 両チームがいる場合は中立に戻る
-            set NewController = 0
-            Print("{TrenchName}: Contested - neutralized")
+            # 両チームがいる場合、前提条件を満たしている敵チームのみ中立化できる
+            var CanNeutralize : logic = false
+
+            if (PreviousController = 1):
+                # Team1が占領中 → Team2が前提条件を満たしているかチェック
+                set CanNeutralize = CanOccupyTrench(TrenchName, 2)
+            else if (PreviousController = 2):
+                # Team2が占領中 → Team1が前提条件を満たしているかチェック
+                set CanNeutralize = CanOccupyTrench(TrenchName, 1)
+
+            if (CanNeutralize = true):
+                # 前提条件を満たしている場合のみ中立化
+                set NewController = 0
+                Print("{TrenchName}: Contested and neutralized - prerequisites met")
+            else:
+                # 前提条件を満たしていない場合は現在の占領状態を維持
+                Print("{TrenchName}: Contested but occupation maintained - prerequisites not met")
         # else: 誰もいない場合は現在の占領状態を保持
 
         # 占領状態が変わった場合�Eみ更新
